@@ -1,6 +1,31 @@
-def main():
-    print("Hello from backend!")
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from core.dbutils import engine
+from models import models
+from routers import video
+import uvicorn
 
+app = FastAPI(
+    title="AI Video Dub Generator",
+    version="1.0.0"
+)
+
+# Create all tables
+models.Base.metadata.create_all(bind=engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to AI Video Dub Generator API"}
+
+app.include_router(video.router, prefix="/api/v1/video", tags=["video-dubbing"])
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run(app, host="0.0.0.0", port=8085)
