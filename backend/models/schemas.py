@@ -38,3 +38,7 @@ class VideoDubStatus(BaseModel):
 
     class Config:
         from_attributes = True
+
+class SupportedLanguagesResponse(BaseModel):
+    languages: dict[str, str] = Field(..., description="Dictionary of enum member names to language codes")
+    total_count: int = Field(..., description="Total number of supported languages")

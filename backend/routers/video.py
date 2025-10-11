@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 import os
 from core.dbutils import get_db
 from models.models import Job
-from models.schemas import VideoDubCreate, VideoDubResponse, VideoDubStatus
+from models.schemas import VideoDubCreate, VideoDubResponse, VideoDubStatus, SupportedLanguagesResponse
 from models.enums import JobStatus, LanguageCode
 from services.video_processor import process_video_dubbing
 
@@ -90,4 +90,13 @@ def download_dubbed_video(job_id: int, db: Session = Depends(get_db)):
         path=job.output_video_path,
         filename=filename,
         media_type='video/mp4'
+    )
+
+@router.get("/languages", response_model=SupportedLanguagesResponse, summary="Get list of supported languages")
+def get_supported_languages():
+    languages = {lang_code.name.title(): lang_code.value for lang_code in LanguageCode}
+    
+    return SupportedLanguagesResponse(
+        languages=languages,
+        total_count=len(languages)
     )
