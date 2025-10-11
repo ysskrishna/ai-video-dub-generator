@@ -9,7 +9,17 @@ from core.config import settings
 from core.dbutils import SessionLocal
 from models.models import Job
 from models.enums import JobStatus
-from services.video_processor_utils import download_youtube_video, transcribe_audio, extract_audio_segments, extract_source_language, translate_segments, synthesize_audio_segments, combine_audio_segments, create_dubbed_video
+from services.video_processor_utils import (
+    download_youtube_video, 
+    transcribe_audio, 
+    extract_audio_segments, 
+    extract_source_language, 
+    translate_segments, 
+    synthesize_audio_segments, 
+    combine_audio_segments, 
+    create_dubbed_video, 
+    extract_audio_duration
+)
 
 logger = logging.getLogger(__name__)
 
@@ -70,17 +80,15 @@ async def process_video_dubbing_sync(job_id: int):
         logger.info("Step 4/6: Synthesizing dubbed audio...")
         audio_segments, temp_dir = synthesize_audio_segments(translated_segments)
         
-        # Get original audio duration
-        original_audio = AudioFileClip(audio_path)
-        total_duration = original_audio.duration
-        original_audio.close()
+        # Get total duration of the audio
+        total_duration = extract_audio_duration(audio_path)
         
         # Step 5: Combine audio segments
         logger.info("Step 5/6: Combining audio segments...")
         dubbed_audio = combine_audio_segments(audio_segments, total_duration)
         
         dubbed_audio_path = f"{output_dir}/dubbed_audio.wav"
-        dubbed_audio.write_audiofile(dubbed_audio_path, verbose=False, logger=None)
+        dubbed_audio.write_audiofile(dubbed_audio_path)
         dubbed_audio.close()
         
         # Clean up audio segments
@@ -125,13 +133,13 @@ async def process_video_dubbing_sync(job_id: int):
         return None
         
     finally:
-        # Clean up temporary files and close database connection
-        if temp_dir and os.path.exists(temp_dir):
-            try:
-                shutil.rmtree(temp_dir)
-                logger.info(f"Cleaned up temporary files for job {job_id}")
-            except Exception:
-                logger.exception(f"Failed to clean up temp directory")
+        # # Clean up temporary files and close database connection
+        # if temp_dir and os.path.exists(temp_dir):
+        #     try:
+        #         shutil.rmtree(temp_dir)
+        #         logger.info(f"Cleaned up temporary files for job {job_id}")
+        #     except Exception:
+        #         logger.exception(f"Failed to clean up temp directory")
         
         db.close()
 

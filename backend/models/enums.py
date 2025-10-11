@@ -15,4 +15,5 @@ class JobErrorCode(str, Enum):
     SYNTHESIS_FAILED = "synthesis_failed"
     COMBINATION_FAILED = "combination_failed"
     VIDEO_CREATION_FAILED = "video_creation_failed"
+    AUDIO_DURATION_EXTRACTION_FAILED = "audio_duration_extraction_failed"
     UNKNOWN_ERROR = "unknown_error"

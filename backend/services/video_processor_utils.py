@@ -134,34 +134,63 @@ def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
             with open(seg_path, "wb") as f:
                 f.write(audio_bytes)
 
+            
+            seg_clip = AudioFileClip(seg_path)
+
             # TODO: Fix the logic to speed up or slow down the audio
-            # seg_clip = AudioFileClip(seg_path)
             # target_duration = seg["duration"]
             # if seg_clip.duration > target_duration * 1.1:
             #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
             # elif seg_clip.duration < target_duration * 0.9:
             #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
-            # audio_segments.append(seg_clip)
-            # seg_clip.close()
+
+            audio_segments.append({'clip': seg_clip, 'start': seg["start"]})
+            seg_clip.close()
         return audio_segments, temp_dir
     except Exception:
         logger.exception(f"Error synthesizing audio segments", extra={"error_code": JobErrorCode.SYNTHESIS_FAILED})
         raise JobProcessingException(JobErrorCode.SYNTHESIS_FAILED)
 
 def combine_audio_segments(audio_segments, total_duration):
-    dubbed_audio = mp.concatenate_audioclips(audio_segments)
-    if dubbed_audio.duration < total_duration:
-        silence = mp.AudioClip(lambda t: [0]*dubbed_audio.nchannels, duration=total_duration - dubbed_audio.duration)
-        dubbed_audio = mp.CompositeAudioClip([dubbed_audio, silence.set_start(dubbed_audio.duration)])
-    elif dubbed_audio.duration > total_duration:
-        dubbed_audio = dubbed_audio.subclip(0, total_duration)
-    return dubbed_audio
+    try:
+        # Create a silence track for the full duration (stereo)
+        silence = mp.AudioClip(lambda t: [0]*2, duration=total_duration)
+        audio_clips = [silence]
+
+        # Place each segment at its start time
+        for seg in audio_segments:
+            clip = seg["clip"]
+            start_time = seg["start"]
+            audio_clips.append(clip.with_start(start_time))
+        
+        dubbed_audio = mp.CompositeAudioClip(audio_clips)
+        logger.info(f"Dubbed audio stats", extra={"duration": dubbed_audio.duration, "total_duration": total_duration})
+        if dubbed_audio.duration > total_duration:
+            dubbed_audio = dubbed_audio.subclipped(0, total_duration)
+        return dubbed_audio
+    except Exception:
+        logger.exception(f"Error combining audio segments", extra={"error_code": JobErrorCode.COMBINATION_FAILED})
+        raise JobProcessingException(JobErrorCode.COMBINATION_FAILED)
 
 def create_dubbed_video(original_video_path, dubbed_audio_path, output_path):
-    video_clip = mp.VideoFileClip(original_video_path)
-    audio_clip = mp.AudioFileClip(dubbed_audio_path)
-    final_clip = video_clip.set_audio(audio_clip)
-    final_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", verbose=False, logger=None)
-    video_clip.close()
-    audio_clip.close()
-    final_clip.close()
+    try:
+        video_clip = mp.VideoFileClip(original_video_path)
+        audio_clip = mp.AudioFileClip(dubbed_audio_path)
+        final_clip = video_clip.set_audio(audio_clip)
+        final_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", verbose=False, logger=None)
+        video_clip.close()
+        audio_clip.close()
+        final_clip.close()
+    except Exception:
+        logger.exception(f"Error creating dubbed video", extra={"error_code": JobErrorCode.VIDEO_CREATION_FAILED})
+        raise JobProcessingException(JobErrorCode.VIDEO_CREATION_FAILED)
+
+def extract_audio_duration(audio_path):
+    try:
+        audio_clip = AudioFileClip(audio_path)
+        duration = audio_clip.duration
+        audio_clip.close()
+        return duration
+    except Exception:
+        logger.exception(f"Error extracting audio duration", extra={"error_code": JobErrorCode.AUDIO_DURATION_EXTRACTION_FAILED})
+        raise JobProcessingException(JobErrorCode.AUDIO_DURATION_EXTRACTION_FAILED)
