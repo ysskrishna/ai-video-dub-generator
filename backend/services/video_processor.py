@@ -42,12 +42,6 @@ async def process_video_dubbing_sync(job_id: int):
         job.updated_at = datetime.now()
         db.commit()
 
-        # # hardcoded for now
-        # temp_dir = os.path.join(settings.TEMP_ROOT, f"job_14") 
-        # src_video_path = os.path.join(temp_dir, "video.mp4")
-        # src_audio_path = os.path.join(temp_dir, "audio.wav")
-        
-
         # # Create output directory in temp storage
         temp_dir = os.path.join(settings.TEMP_ROOT, f"job_{job_id}")
         os.makedirs(temp_dir, exist_ok=True)
@@ -61,6 +55,11 @@ async def process_video_dubbing_sync(job_id: int):
         transcribed_response = await transcribe_audio(src_audio_path)
         segments = extract_audio_segments(transcribed_response)
         source_language = extract_source_language(transcribed_response)
+
+        # Update source language
+        job.source_language = source_language
+        db.commit()
+        
         logger.info(f"Extracted segments", extra={"segments": segments})
         logger.info(f"Detected Source language", extra={"source_language": source_language})
         
@@ -68,11 +67,6 @@ async def process_video_dubbing_sync(job_id: int):
         logger.info("Step 3/6: Translating segments...", extra={"source_language": source_language, "target_language": job.target_language})
         translated_segments = await translate_segments(segments, source_language, job.target_language)
         print(translated_segments)
-
-        # translated_segments = [
-        #     {'start': 8.559999, 'end': 13.935, 'transcript': "'तुम्हारी ढेरों में भरा हुआ। बेसी पीछे है, भाई। मैं तुम्हारी मां को ऐसा पॉट बनाना चाहता हूं। तुम्हें कुछ दूं।'", 'duration': 5.375001000000001}, 
-        #     {'start': 19.535, 'end': 20.435001, 'transcript': '"क्या? ओह।"', 'duration': 0.9000009999999996}
-        # ]
         
         # Step 4: Synthesize dubbed audio
         logger.info("Step 4/6: Synthesizing dubbed audio...")

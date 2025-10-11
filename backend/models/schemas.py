@@ -14,7 +14,8 @@ class VideoDubCreate(BaseModel):
         youtube_patterns = [
             r"https?://(?:www\.)?youtube\.com/watch\?v=[\w-]+",
             r"https?://(?:www\.)?youtu\.be/[\w-]+",
-            r"https?://(?:www\.)?youtube\.com/embed/[\w-]+"
+            r"https?://(?:www\.)?youtube\.com/embed/[\w-]+",
+            r"https?://(?:www\.)?youtube\.com/shorts/[\w-]+"
         ]
         if not any(re.match(pattern, v) for pattern in youtube_patterns):
             raise ValueError("Invalid YouTube URL format")

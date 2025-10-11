@@ -67,9 +67,11 @@ def extract_audio_segments(transcribed_response):
                         "confidence": utterance.confidence
                     })
                 return segments
-            
+        
         logger.exception("No speech segments found in transcription response", extra={"error_code": JobErrorCode.AUDIO_SEGMENTS_NOT_FOUND})
         raise JobProcessingException(JobErrorCode.AUDIO_SEGMENTS_NOT_FOUND)
+    except JobProcessingException:
+        raise
     except Exception:
         logger.exception(f"Error extracting audio segments", extra={"error_code": JobErrorCode.AUDIO_SEGEMENTS_EXTRACTION_FAILED})
         raise JobProcessingException(JobErrorCode.AUDIO_SEGEMENTS_EXTRACTION_FAILED)
@@ -77,7 +79,7 @@ def extract_audio_segments(transcribed_response):
 def extract_source_language(transcribed_response):
     try:
         if transcribed_response.results and transcribed_response.results.channels:
-            return transcribed_response.results.channels[0].language_code
+            return transcribed_response.results.channels[0].detected_language
         
         logger.warning(f"No source language found in transcription response, defaulting to {settings.DEFAULT_SOURCE_LANGUAGE}")
         return settings.DEFAULT_SOURCE_LANGUAGE

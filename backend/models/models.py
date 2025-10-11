@@ -16,6 +16,7 @@ class Job(Timestamp, Base):
     job_id = Column(Integer, primary_key=True, autoincrement=True)
     video_url = Column(String)
     target_language = Column(String)
+    source_language = Column(String, nullable=True)
     status = Column(String, default=JobStatus.PENDING.value)
     error_code = Column(String, nullable=True)
     output_video_path = Column(String, nullable=True)
