@@ -166,8 +166,8 @@ def create_dubbed_video(original_video_path, dubbed_audio_path, output_path):
     try:
         video_clip = mp.VideoFileClip(original_video_path)
         audio_clip = mp.AudioFileClip(dubbed_audio_path)
-        final_clip = video_clip.set_audio(audio_clip)
-        final_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", verbose=False, logger=None)
+        final_clip = video_clip.with_audio(audio_clip)
+        final_clip.write_videofile(output_path, codec="libx264", audio_codec="aac")
         video_clip.close()
         audio_clip.close()
         final_clip.close()
