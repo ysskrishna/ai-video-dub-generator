@@ -11,4 +11,9 @@ dependencies = [
     "pydantic>=2.5.0",
     "pydantic-settings>=2.1.0",
     "python-dotenv>=1.0.0",
+    "yt-dlp>=2025.9.26",
+    "moviepy>=2.2.1",
+    "deepgram-sdk>=5.0.0",
+    "openai>=2.3.0",
+    "elevenlabs>=2.17.0",
 ]
