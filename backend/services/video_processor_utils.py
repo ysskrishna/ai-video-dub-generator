@@ -43,7 +43,7 @@ async def transcribe_audio(audio_path):
         with open(audio_path, "rb") as audio:
             return deepgram.listen.v1.media.transcribe_file(
                 request=audio.read(),
-                model="nova-2",
+                model="nova-3",
                 detect_language=True,
                 smart_format=True,
                 punctuate=True,
@@ -54,7 +54,7 @@ async def transcribe_audio(audio_path):
         raise JobProcessingException(JobErrorCode.AUDIO_TRANSCRIPTION_FAILED)
 
 def extract_audio_segments(transcribed_response):
-    # print(transcribed_response)
+    print("transcribed_response", transcribed_response)
     segments = []
     try:
         if hasattr(transcribed_response, 'results') and transcribed_response.results:
@@ -66,6 +66,7 @@ def extract_audio_segments(transcribed_response):
                         "transcript": utterance.transcript,
                         "confidence": utterance.confidence
                     })
+                print("segments", segments)
                 return segments
         
         logger.exception("No speech segments found in transcription response", extra={"error_code": JobErrorCode.AUDIO_SEGMENTS_NOT_FOUND})
@@ -91,7 +92,7 @@ async def translate_segments(segments, source_lang, target_lang):
     try:
         translated_segments = []
         for seg in segments:
-            prompt = f"Translate the following text from {source_lang} to {target_lang}, keeping it natural and concise: '{seg['transcript']}'"
+            prompt = f"Translate '{seg['transcript']}' from {source_lang} to {target_lang}. Output only the translated text."
             response = await openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],

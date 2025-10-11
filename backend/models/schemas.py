@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 import re
-from typing import Optional, List, Dict, Union
+from typing import Optional
 from models.enums import JobStatus
 from datetime import datetime
 
