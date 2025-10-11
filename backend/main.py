@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.dbutils import engine
+from core.logging import setup_logging
 from models import models
 from routers import video
 import uvicorn
+
+setup_logging()
 
 app = FastAPI(
     title="AI Video Dub Generator",
