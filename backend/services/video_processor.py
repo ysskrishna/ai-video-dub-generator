@@ -87,6 +87,7 @@ async def process_video_dubbing_sync(job_id: int):
         logger.info("Step 5/6: Combining audio segments...")
         dubbed_audio = combine_audio_segments(audio_segments, total_duration)
         
+        logger.info(f"Dubbed audio", extra={"duration": dubbed_audio.duration, "total_duration": total_duration})
         dubbed_audio_path = f"{output_dir}/dubbed_audio.wav"
         dubbed_audio.write_audiofile(dubbed_audio_path)
         dubbed_audio.close()
@@ -98,7 +99,7 @@ async def process_video_dubbing_sync(job_id: int):
             shutil.rmtree(temp_dir)
         
         # Step 6: Create final dubbed video
-        output_video = f"{output_dir}/dubbed_video_{job_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
+        output_video = f"{output_dir}/dubbed_video.mp4"
         logger.info("Step 6/6: Creating final dubbed video...")
         create_dubbed_video(video_path, dubbed_audio_path, output_video)
         

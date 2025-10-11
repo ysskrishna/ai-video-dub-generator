@@ -134,18 +134,15 @@ def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
             with open(seg_path, "wb") as f:
                 f.write(audio_bytes)
 
-            
             seg_clip = AudioFileClip(seg_path)
-
-            # TODO: Fix the logic to speed up or slow down the audio
-            # target_duration = seg["duration"]
-            # if seg_clip.duration > target_duration * 1.1:
-            #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
+            target_duration = seg["duration"]
+            if seg_clip.duration > target_duration * 1.1:
+                seg_clip = seg_clip.with_speed_scaled(target_duration / seg_clip.duration)
             # elif seg_clip.duration < target_duration * 0.9:
-            #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
+            #     seg_clip = seg_clip.with_speed_scaled(target_duration / seg_clip.duration)
 
-            audio_segments.append({'clip': seg_clip, 'start': seg["start"]})
-            seg_clip.close()
+            seg_clip = seg_clip.with_start(seg["start"])
+            audio_segments.append(seg_clip)
         return audio_segments, temp_dir
     except Exception:
         logger.exception(f"Error synthesizing audio segments", extra={"error_code": JobErrorCode.SYNTHESIS_FAILED})
@@ -155,16 +152,9 @@ def combine_audio_segments(audio_segments, total_duration):
     try:
         # Create a silence track for the full duration (stereo)
         silence = mp.AudioClip(lambda t: [0]*2, duration=total_duration)
-        audio_clips = [silence]
-
-        # Place each segment at its start time
-        for seg in audio_segments:
-            clip = seg["clip"]
-            start_time = seg["start"]
-            audio_clips.append(clip.with_start(start_time))
+        audio_clips = [silence, *audio_segments]
         
         dubbed_audio = mp.CompositeAudioClip(audio_clips)
-        logger.info(f"Dubbed audio stats", extra={"duration": dubbed_audio.duration, "total_duration": total_duration})
         if dubbed_audio.duration > total_duration:
             dubbed_audio = dubbed_audio.subclipped(0, total_duration)
         return dubbed_audio
