@@ -54,7 +54,7 @@ async def transcribe_audio(audio_path):
         raise JobProcessingException(JobErrorCode.AUDIO_TRANSCRIPTION_FAILED)
 
 def extract_audio_segments(transcribed_response):
-    print(transcribed_response)
+    # print(transcribed_response)
     segments = []
     try:
         if hasattr(transcribed_response, 'results') and transcribed_response.results:
@@ -130,10 +130,12 @@ def synthesize_audio_segments(temp_dir, segments, voice_id="pNInz6obpgDQGcFmaJgB
 
             seg_clip = AudioFileClip(seg_path)
             target_duration = seg["duration"]
-            if seg_clip.duration > target_duration * 1.1:
-                seg_clip = seg_clip.with_speed_scaled(target_duration / seg_clip.duration)
-            # elif seg_clip.duration < target_duration * 0.9:
-            #     seg_clip = seg_clip.with_speed_scaled(target_duration / seg_clip.duration)
+            if seg_clip.duration > target_duration * 1.01:
+                logger.debug("Speeding up the segment because seg_clip.duration > target_duration * 1.01", extra={"seg_clip.duration": seg_clip.duration, "target_duration": target_duration})
+                seg_clip = seg_clip.with_speed_scaled(seg_clip.duration / target_duration)
+            elif seg_clip.duration < target_duration * 0.9:
+                logger.debug("Slowing down the segment because seg_clip.duration < target_duration * 0.9", extra={"seg_clip.duration": seg_clip.duration, "target_duration": target_duration})
+                seg_clip = seg_clip.with_speed_scaled(seg_clip.duration / target_duration)
 
             seg_clip = seg_clip.with_start(seg["start"])
             audio_segments.append(seg_clip)
