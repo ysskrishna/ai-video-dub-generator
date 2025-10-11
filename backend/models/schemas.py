@@ -30,7 +30,7 @@ class VideoDubStatus(BaseModel):
     video_url: str
     target_language: str
     status: JobStatus
-    error_message: Optional[str] = None
+    error_code: Optional[str] = None
     output_video_path: Optional[str] = None
     created_at: datetime
     updated_at: datetime

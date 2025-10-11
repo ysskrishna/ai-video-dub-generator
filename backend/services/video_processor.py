@@ -2,13 +2,13 @@ import os
 import logging
 import shutil
 import asyncio
-from moviepy import AudioFileClip
 from datetime import datetime
 
 from core.config import settings
 from core.dbutils import SessionLocal
+from models.exceptions import JobProcessingException
 from models.models import Job
-from models.enums import JobStatus
+from models.enums import JobStatus, JobErrorCode
 from services.video_processor_utils import (
     download_youtube_video, 
     transcribe_audio, 
@@ -39,7 +39,6 @@ async def process_video_dubbing_sync(job_id: int):
         
         # Update status to processing
         job.status = JobStatus.PROCESSING.value
-        job.error_message = None
         job.updated_at = datetime.now()
         db.commit()
 
@@ -103,24 +102,22 @@ async def process_video_dubbing_sync(job_id: int):
         # Update job as completed
         job.status = JobStatus.COMPLETED.value
         job.output_video_path = output_video
-        job.error_message = None
         job.updated_at = datetime.now()
         db.commit()
         
         logger.info(f"Job {job_id} completed successfully! Output: {output_video}")
-        
+    except JobProcessingException as e:
+        logger.exception(f"Error in processing video dubbing for job {job_id}", extra={"error_code": e.error_code})
+        job.status = JobStatus.FAILED.value
+        job.error_code = e.error_code.value
+        job.updated_at = datetime.now()
+        db.commit()
     except Exception as e:
-        logger.exception(f"Error processing job {job_id}")
-        
-        # Update job status to failed
-        if job:
-            try:
-                job.status = JobStatus.FAILED.value
-                job.error_message = f"{str(e)}"
-                job.updated_at = datetime.now()
-                db.commit()
-            except Exception as db_error:
-                logger.error(f"Error updating job status: {str(db_error)}")
+        logger.exception(f"Unknown error in processing video dubbing for job {job_id}", extra={"error_code": JobErrorCode.UNKNOWN_ERROR})
+        job.status = JobStatus.FAILED.value
+        job.error_code = JobErrorCode.UNKNOWN_ERROR.value
+        job.updated_at = datetime.now()
+        db.commit()
         
     finally:
         # Clean up temporary files and close database connection

@@ -17,5 +17,5 @@ class Job(Timestamp, Base):
     video_url = Column(String)
     target_language = Column(String)
     status = Column(String, default=JobStatus.PENDING.value)
-    error_message = Column(Text, nullable=True)
+    error_code = Column(String, nullable=True)
     output_video_path = Column(String, nullable=True)

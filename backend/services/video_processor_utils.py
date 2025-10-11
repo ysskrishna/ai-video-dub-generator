@@ -1,4 +1,3 @@
-import os
 import logging
 import yt_dlp
 import moviepy as mp
@@ -6,7 +5,6 @@ from moviepy import AudioFileClip
 from deepgram import DeepgramClient
 from openai import AsyncOpenAI
 from elevenlabs import ElevenLabs, VoiceSettings
-from datetime import datetime
 
 from core.config import settings
 from models.enums import JobErrorCode
