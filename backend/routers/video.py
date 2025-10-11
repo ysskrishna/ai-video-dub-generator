@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+import os
 from core.dbutils import get_db
 from models.models import Job
 from models.schemas import VideoDubCreate, VideoDubResponse, VideoDubStatus
@@ -46,7 +48,6 @@ def get_video_dub_status(job_id: int, db: Session = Depends(get_db)):
         target_language=job.target_language,
         status=JobStatus(job.status),
         error_code=job.error_code,
-        output_video_path=job.output_video_path,
         created_at=job.created_at,
         updated_at=job.updated_at
     )
@@ -62,9 +63,30 @@ def list_video_dub_jobs(db: Session = Depends(get_db)):
             target_language=job.target_language,
             status=JobStatus(job.status),
             error_code=job.error_code,
-            output_video_path=job.output_video_path,
             created_at=job.created_at,
             updated_at=job.updated_at
         )
         for job in jobs
     ]
+
+@router.get("/download/{job_id}", summary="Download completed dubbed video")
+def download_dubbed_video(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job.status != JobStatus.COMPLETED.value:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Job is not completed yet. Current status: {job.status}"
+        )
+    
+    if not job.output_video_path or not os.path.exists(job.output_video_path):
+        raise HTTPException(status_code=404, detail="Output video file not found")
+    
+    filename = os.path.basename(job.output_video_path)
+    return FileResponse(
+        path=job.output_video_path,
+        filename=filename,
+        media_type='video/mp4'
+    )
