@@ -5,7 +5,7 @@ import moviepy as mp
 from moviepy import AudioFileClip
 from deepgram import DeepgramClient
 from openai import AsyncOpenAI
-from elevenlabs import AsyncElevenLabs, VoiceSettings
+from elevenlabs import ElevenLabs, VoiceSettings
 from datetime import datetime
 
 from core.config import settings
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 deepgram = DeepgramClient(api_key=settings.DEEPGRAM_API_KEY)
 openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-elevenlabs = AsyncElevenLabs(api_key=settings.ELEVENLABS_API_KEY)
+elevenlabs = ElevenLabs(api_key=settings.ELEVENLABS_API_KEY)
 
 async def download_youtube_video(url, output_dir):
     try:
@@ -108,17 +108,17 @@ async def translate_segments(segments, source_lang, target_lang):
         logger.exception(f"Error translating segments", extra={"error_code": JobErrorCode.TRANSLATION_FAILED})
         raise JobProcessingException(JobErrorCode.TRANSLATION_FAILED)
 
-async def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB", target_lang="es"):
+def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
     try:
         audio_segments = []
         temp_dir = os.path.join(settings.TEMP_DIR, f"synthesis_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}")
         os.makedirs(temp_dir, exist_ok=True)
         
         for i, seg in enumerate(segments):
-            audio = await elevenlabs.generate(
+            audio_generator = elevenlabs.text_to_speech.convert(
+                voice_id=voice_id,
                 text=seg["transcript"],
-                voice=voice_id,
-                model="eleven_multilingual_v2",
+                model_id="eleven_multilingual_v2",
                 voice_settings=VoiceSettings(
                     stability=0.5,
                     similarity_boost=0.75,
@@ -126,17 +126,23 @@ async def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB", t
                     use_speaker_boost=True,
                 )
             )
+
+            # Convert the generator to bytes
+            audio_bytes = b"".join(chunk for chunk in audio_generator)
+
             seg_path = f"{temp_dir}/seg_{i}.mp3"
             with open(seg_path, "wb") as f:
-                f.write(audio)
-            seg_clip = AudioFileClip(seg_path)
-            target_duration = seg["duration"]
-            if seg_clip.duration > target_duration * 1.1:
-                seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
-            elif seg_clip.duration < target_duration * 0.9:
-                seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
-            audio_segments.append(seg_clip)
-            seg_clip.close()
+                f.write(audio_bytes)
+
+            # TODO: Fix the logic to speed up or slow down the audio
+            # seg_clip = AudioFileClip(seg_path)
+            # target_duration = seg["duration"]
+            # if seg_clip.duration > target_duration * 1.1:
+            #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
+            # elif seg_clip.duration < target_duration * 0.9:
+            #     seg_clip = seg_clip.speedx(target_duration / seg_clip.duration)
+            # audio_segments.append(seg_clip)
+            # seg_clip.close()
         return audio_segments, temp_dir
     except Exception:
         logger.exception(f"Error synthesizing audio segments", extra={"error_code": JobErrorCode.SYNTHESIS_FAILED})
