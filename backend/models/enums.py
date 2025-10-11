@@ -5,3 +5,14 @@ class JobStatus(str, Enum):
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
+
+class JobErrorCode(str, Enum):
+    VIDEO_DOWNLOAD_FAILED = "video_download_failed"
+    AUDIO_TRANSCRIPTION_FAILED = "audio_transcription_failed"
+    AUDIO_SEGEMENTS_EXTRACTION_FAILED = "audio_segments_extraction_failed"
+    AUDIO_SEGMENTS_NOT_FOUND = "audio_segments_not_found"
+    TRANSLATION_FAILED = "translation_failed"
+    SYNTHESIS_FAILED = "synthesis_failed"
+    COMBINATION_FAILED = "combination_failed"
+    VIDEO_CREATION_FAILED = "video_creation_failed"
+    UNKNOWN_ERROR = "unknown_error"

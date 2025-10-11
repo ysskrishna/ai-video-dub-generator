@@ -13,7 +13,8 @@ from datetime import datetime
 from core.config import settings
 from core.dbutils import SessionLocal
 from models.models import Job
-from models.enums import JobStatus
+from models.enums import JobStatus, JobErrorCode
+from models.exceptions import JobProcessingException
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,35 +24,73 @@ openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 elevenlabs = AsyncElevenLabs(api_key=settings.ELEVENLABS_API_KEY)
 
 async def download_youtube_video(url, output_dir):
-    ydl_opts = {
-        'format': 'best[height<=720]/best',
-        'outtmpl': f'{output_dir}/video.%(ext)s',
-        'writesubtitles': False,
-        'writeautomaticsub': False,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-        info = ydl.extract_info(url, download=False)
-        ext = info.get('ext', 'mp4')
-        video_path = f"{output_dir}/video.{ext}"
-        audio_path = f"{output_dir}/audio.wav"
-        video_clip = mp.VideoFileClip(video_path)
-        video_clip.audio.write_audiofile(audio_path)
-        video_clip.close()
-        return video_path, audio_path
+    try:
+        ydl_opts = {
+            'format': 'best[height<=720]/best',
+            'outtmpl': f'{output_dir}/video.%(ext)s',
+            'writesubtitles': False,
+            'writeautomaticsub': False,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+            info = ydl.extract_info(url, download=False)
+            ext = info.get('ext', 'mp4')
+            video_path = f"{output_dir}/video.{ext}"
+            audio_path = f"{output_dir}/audio.wav"
+            video_clip = mp.VideoFileClip(video_path)
+            video_clip.audio.write_audiofile(audio_path)
+            video_clip.close()
+            return video_path, audio_path
+    except Exception as e:
+        logger.exception(f"Error downloading YouTube video", extra={"error_code": JobErrorCode.VIDEO_DOWNLOAD_FAILED})
+        raise JobProcessingException(JobErrorCode.VIDEO_DOWNLOAD_FAILED)
 
-async def transcribe_audio(audio_path, language="en"):
-    with open(audio_path, "rb") as audio:
-        response = deepgram.listen.v1.media.transcribe_file(
-            request=audio,
-            model="nova-2",
-            language=language,
-            smart_format=True,
-            punctuate=True,
-            utterances=True,
-        )
-        transcript = response.to_dict()
-        return transcript
+async def transcribe_audio(audio_path):
+    try:
+        with open(audio_path, "rb") as audio:
+            return deepgram.listen.v1.media.transcribe_file(
+                request=audio.read(),
+                model="nova-2",
+                detect_language=True,
+                smart_format=True,
+                punctuate=True,
+                utterances=True,
+            )
+    except Exception:
+        logger.exception(f"Error transcribing audio", extra={"error_code": JobErrorCode.AUDIO_TRANSCRIPTION_FAILED})
+        raise JobProcessingException(JobErrorCode.AUDIO_TRANSCRIPTION_FAILED)
+
+def extract_audio_segments(transcribed_response):
+    print(transcribed_response)
+    segments = []
+    try:
+        if hasattr(transcribed_response, 'results') and transcribed_response.results:
+            if hasattr(transcribed_response.results, 'utterances') and transcribed_response.results.utterances:
+                for utterance in transcribed_response.results.utterances:
+                    segments.append({
+                        "start": utterance.start,
+                        "end": utterance.end,
+                        "transcript": utterance.transcript,
+                        "confidence": utterance.confidence
+                    })
+                return segments
+            
+        logger.exception("No speech segments found in transcription response", extra={"error_code": JobErrorCode.AUDIO_SEGMENTS_NOT_FOUND})
+        raise JobProcessingException(JobErrorCode.AUDIO_SEGMENTS_NOT_FOUND)
+    except Exception as e:
+        logger.exception(f"Error extracting audio segments", extra={"error_code": JobErrorCode.AUDIO_SEGEMENTS_EXTRACTION_FAILED})
+        raise JobProcessingException(JobErrorCode.AUDIO_SEGEMENTS_EXTRACTION_FAILED)
+
+def extract_source_language(transcribed_response):
+    try:
+        if transcribed_response.results and transcribed_response.results.channels:
+            return transcribed_response.results.channels[0].language_code
+        
+        logger.warning(f"No source language found in transcription response, defaulting to {settings.DEFAULT_SOURCE_LANGUAGE}")
+        return settings.DEFAULT_SOURCE_LANGUAGE
+    except Exception as e:
+        logger.exception(f"Error extracting source language. defaulting to {settings.DEFAULT_SOURCE_LANGUAGE}")
+        return settings.DEFAULT_SOURCE_LANGUAGE
 
 async def translate_segments(segments, source_lang="en", target_lang="es"):
     translated_segments = []
@@ -130,40 +169,40 @@ async def process_video_dubbing_sync(job_id: int):
             logger.error(f"Job {job_id} not found in database")
             return None
         
-        logger.info(f"Processing video dubbing for job {job_id}")
-        logger.info(f"Video URL: {job.video_url}")
-        logger.info(f"Target Language: {job.target_language}")
+        logger.info(f"Processing video dubbing for job {job_id}", extra={"video_url": job.video_url, "target_language": job.target_language})
         
         # Update status to processing
         job.status = JobStatus.PROCESSING.value
         job.error_message = None
         job.updated_at = datetime.now()
         db.commit()
+
+        # hardcoded for now
+        output_dir = os.path.join(settings.TEMP_DIR, f"job_14") 
+        video_path = os.path.join(output_dir, "video.mp4")
+        audio_path = os.path.join(output_dir, "audio.wav")
         
-        # Create output directory in temp storage
-        output_dir = os.path.join(settings.TEMP_DIR, f"job_{job_id}")
-        os.makedirs(output_dir, exist_ok=True)
+        # # Create output directory in temp storage
+        # output_dir = os.path.join(settings.TEMP_DIR, f"job_{job_id}")
+        # os.makedirs(output_dir, exist_ok=True)
         
-        # Step 1: Download video
-        logger.info("Step 1/6: Downloading video...")
-        video_path, audio_path = await download_youtube_video(job.video_url, output_dir)
+        # # Step 1: Download video
+        # logger.info("Step 1/6: Downloading video...")
+        # video_path, audio_path = await download_youtube_video(job.video_url, output_dir)
         
-        # Step 2: Transcribe audio
-        source_language = "en"  # Default source language
-        logger.info("Step 2/6: Transcribing audio...")
-        transcript = await transcribe_audio(audio_path, source_language)
-        
-        segments = transcript.get("results", {}).get("utterances", [])
-        if not segments:
-            paragraphs = transcript.get("results", {}).get("paragraphs", [])
-            segments = [{"start": p["start"], "end": p["end"], "transcript": p["transcript"]} for p in paragraphs]
-        
-        if not segments:
-            raise Exception("No speech detected in the video")
+        # Step 2: Transcribe audio        
+        logger.info("Step 2/6: Transcribing audio...", extra={"audio_path": audio_path})
+        transcribed_response = await transcribe_audio(audio_path)
+        segments = extract_audio_segments(transcribed_response)
+        source_language = extract_source_language(transcribed_response)
+        logger.info(f"Extracted segments", extra={"segments": segments})
+        logger.info(f"Detected Source language", extra={"source_language": source_language})
         
         # Step 3: Translate segments
-        logger.info("Step 3/6: Translating segments...")
+        logger.info("Step 3/6: Translating segments...", extra={"source_language": source_language, "target_language": job.target_language})
         translated_segments = await translate_segments(segments, source_language, job.target_language)
+        print(translated_segments)
+        logger.info(f"Translated segments", extra={"translated_segments": translated_segments})
         
         # Step 4: Synthesize dubbed audio
         logger.info("Step 4/6: Synthesizing dubbed audio...")

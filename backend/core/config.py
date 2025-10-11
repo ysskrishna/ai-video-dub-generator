@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     DEEPGRAM_API_KEY: str
     OPENAI_API_KEY: str
     ELEVENLABS_API_KEY: str
+    DEFAULT_SOURCE_LANGUAGE: str = "en"
     
     # Storage paths
     STORAGE_ROOT: str = str(Path(__file__).parent.parent / "storage")

@@ -1,0 +1,2 @@
+class JobProcessingException(Exception):
+    pass
