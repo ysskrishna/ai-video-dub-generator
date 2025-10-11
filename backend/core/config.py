@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # Storage paths
     STORAGE_ROOT: str = str(Path(__file__).parent.parent / "storage")
-    TEMP_DIR: str = str(Path(__file__).parent.parent / "storage" / "temp")
+    TEMP_ROOT: str = str(Path(__file__).parent.parent / "storage" / "temp")
     
     class Config:
         env_file = ".env"
@@ -22,6 +22,6 @@ class Settings(BaseSettings):
         super().__init__(**data)
         # Ensure directories exist
         os.makedirs(self.STORAGE_ROOT, exist_ok=True)
-        os.makedirs(self.TEMP_DIR, exist_ok=True)
+        os.makedirs(self.TEMP_ROOT, exist_ok=True)
 
 settings = Settings()

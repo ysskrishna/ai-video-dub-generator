@@ -108,12 +108,9 @@ async def translate_segments(segments, source_lang, target_lang):
         logger.exception(f"Error translating segments", extra={"error_code": JobErrorCode.TRANSLATION_FAILED})
         raise JobProcessingException(JobErrorCode.TRANSLATION_FAILED)
 
-def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
+def synthesize_audio_segments(temp_dir, segments, voice_id="pNInz6obpgDQGcFmaJgB"):
     try:
         audio_segments = []
-        temp_dir = os.path.join(settings.TEMP_DIR, f"synthesis_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}")
-        os.makedirs(temp_dir, exist_ok=True)
-        
         for i, seg in enumerate(segments):
             audio_generator = elevenlabs.text_to_speech.convert(
                 voice_id=voice_id,
@@ -129,7 +126,6 @@ def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
 
             # Convert the generator to bytes
             audio_bytes = b"".join(chunk for chunk in audio_generator)
-
             seg_path = f"{temp_dir}/seg_{i}.mp3"
             with open(seg_path, "wb") as f:
                 f.write(audio_bytes)
@@ -143,7 +139,7 @@ def synthesize_audio_segments(segments, voice_id="pNInz6obpgDQGcFmaJgB"):
 
             seg_clip = seg_clip.with_start(seg["start"])
             audio_segments.append(seg_clip)
-        return audio_segments, temp_dir
+        return audio_segments
     except Exception:
         logger.exception(f"Error synthesizing audio segments", extra={"error_code": JobErrorCode.SYNTHESIS_FAILED})
         raise JobProcessingException(JobErrorCode.SYNTHESIS_FAILED)
