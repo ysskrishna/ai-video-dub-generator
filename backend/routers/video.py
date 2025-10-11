@@ -4,7 +4,7 @@ from core.dbutils import get_db
 from models.models import Job
 from models.schemas import VideoDubCreate, VideoDubResponse, VideoDubStatus
 from models.enums import JobStatus
-from services.video_processor import process_video_dubbing_sync
+from services.video_processor import process_video_dubbing
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ def create_video_dub_job(
     db.commit()
     db.refresh(db_job)
     
-    background_tasks.add_task(process_video_dubbing_sync, db_job.job_id)
+    background_tasks.add_task(process_video_dubbing, db_job.job_id)
     
     return VideoDubResponse(
         job_id=db_job.job_id,

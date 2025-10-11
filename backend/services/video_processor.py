@@ -23,7 +23,7 @@ from services.video_processor_utils import (
 
 logger = logging.getLogger(__name__)
 
-async def process_video_dubbing_sync(job_id: int):
+async def _process_video_dubbing(job_id: int):
     db = SessionLocal()
     job = None
     temp_dir = None
@@ -125,4 +125,4 @@ async def process_video_dubbing_sync(job_id: int):
 
 
 def process_video_dubbing(job_id: int):
-    return asyncio.run(process_video_dubbing_sync(job_id))
+    return asyncio.run(_process_video_dubbing(job_id))
