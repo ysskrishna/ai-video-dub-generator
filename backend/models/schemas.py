@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field, field_validator
 import re
 from typing import Optional
-from models.enums import JobStatus
+from models.enums import JobStatus, LanguageCode
 from datetime import datetime
 
 # Video Dubbing Schemas
 class VideoDubCreate(BaseModel):
     video_url: str = Field(..., description="YouTube URL to dub")
-    target_language: str = Field(..., description="Target language for dubbing (e.g., 'en', 'es', 'fr')")
+    target_language: LanguageCode = Field(..., description="Target language for dubbing (e.g., 'en', 'es', 'fr')")
     
     @field_validator("video_url")
     def validate_youtube_url(cls, v):
@@ -24,12 +24,13 @@ class VideoDubCreate(BaseModel):
 class VideoDubResponse(BaseModel):
     job_id: int
     status: JobStatus
+    target_language: LanguageCode
     message: str
 
 class VideoDubStatus(BaseModel):
     job_id: int
     video_url: str
-    target_language: str
+    target_language: LanguageCode
     status: JobStatus
     error_code: Optional[str] = None
     created_at: datetime

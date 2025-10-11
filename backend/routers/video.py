@@ -5,7 +5,7 @@ import os
 from core.dbutils import get_db
 from models.models import Job
 from models.schemas import VideoDubCreate, VideoDubResponse, VideoDubStatus
-from models.enums import JobStatus
+from models.enums import JobStatus, LanguageCode
 from services.video_processor import process_video_dubbing
 
 router = APIRouter()
@@ -31,7 +31,8 @@ def create_video_dub_job(
     
     return VideoDubResponse(
         job_id=db_job.job_id,
-        status=db_job.status,
+        status=JobStatus(db_job.status),
+        target_language=LanguageCode(db_job.target_language),
         message="Video dubbing job created successfully. Processing will begin shortly."
     )
 
@@ -45,7 +46,7 @@ def get_video_dub_status(job_id: int, db: Session = Depends(get_db)):
     return VideoDubStatus(
         job_id=job.job_id,
         video_url=job.video_url,
-        target_language=job.target_language,
+        target_language=LanguageCode(job.target_language),
         status=JobStatus(job.status),
         error_code=job.error_code,
         created_at=job.created_at,
@@ -60,7 +61,7 @@ def list_video_dub_jobs(db: Session = Depends(get_db)):
         VideoDubStatus(
             job_id=job.job_id,
             video_url=job.video_url,
-            target_language=job.target_language,
+            target_language=LanguageCode(job.target_language),
             status=JobStatus(job.status),
             error_code=job.error_code,
             created_at=job.created_at,
