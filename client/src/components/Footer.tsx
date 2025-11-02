@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
-    <footer className="py-2 md:py-4">
-      <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 md:px-6">
+    <footer className="border-t border-border py-2 md:py-4">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <a
           href="https://github.com/ysskrishna"
           target="_blank"
