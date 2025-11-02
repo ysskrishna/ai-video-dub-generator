@@ -166,7 +166,7 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12">
+    <div className="w-full space-y-12">
       {/* Create Section */}
       <div className="space-y-6">
         <div className="space-y-2">
