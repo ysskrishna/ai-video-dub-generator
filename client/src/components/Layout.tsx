@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Video } from "lucide-react";
+import { Footer } from "./Footer";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,14 +26,7 @@ export const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-xs text-muted-foreground text-center">
-            Built by Siva Sai
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
