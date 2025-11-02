@@ -1,7 +1,36 @@
 {
   "name": "ai-video-dub-generator-frontend",
+  "version": "1.0.0",
+  "description": "Discover an innovative AI-driven platform that seamlessly dubs videos across languages.Powered by Deepgram for speech recognition, OpenAI for translation, and Eleven Labs for lifelike voiceovers, we help content creators, educators, and businesses reach global audiences effortlessly.",
+  "author": {
+    "name": "ysskrishna",
+    "url": "https://github.com/ysskrishna"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "video",
+    "dubbing",
+    "translation",
+    "speech-to-text",
+    "text-to-speech",
+    "deepgram",
+    "openai",
+    "elevenlabs",
+    "video-processing",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "homepage": "https://github.com/ysskrishna/ai-video-dub-generator#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ysskrishna/ai-video-dub-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ysskrishna/ai-video-dub-generator/issues"
+  },
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
