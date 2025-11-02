@@ -1,6 +1,6 @@
 import { Download, ExternalLink, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "./StatusBadge";
+import { StatusBadge } from "@/components/StatusBadge";
 import { JobStatus } from "@/lib/api";
 import { format } from "date-fns";
 
