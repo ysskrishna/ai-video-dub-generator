@@ -9,7 +9,7 @@ export function Header() {
         <div className="flex h-14 items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <img src="/public/logo.svg" alt="Logo" className="h-5 w-5" />
-            <span className="font-semibold text-sm">AI Video Dub</span>
+            <span className="font-semibold text-sm">AI Video Dub Generator</span>
           </Link>
           <Button variant="outline" size="sm" asChild>
             <a
