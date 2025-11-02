@@ -8,6 +8,9 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { api, LanguagesResponse, JobStatus } from "@/lib/api";
 import { JobCard } from "@/components/JobCard";
+import deepgramLogo from "@/assets/deepgram.png";
+import openaiLogo from "@/assets/openai.svg";
+import elevenlabsLogo from "@/assets/elevenlabs.svg";
 
 const Home = () => {
   const [videoUrl, setVideoUrl] = useState("");
@@ -170,11 +173,57 @@ const Home = () => {
       {/* Create Section */}
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Create Dubbed Video</h1>
+          <p className="text-xl font-bold tracking-tight">Discover an innovative AI-driven platform that seamlessly dubs videos across languages.</p>
           <p className="text-sm text-muted-foreground">
-            Enter a video URL and select your target language
+             Powered by Deepgram for speech recognition, OpenAI for translation, and Eleven Labs for lifelike voiceovers, we help content creators, educators, and businesses reach global audiences effortlessly.
           </p>
         </div>
+        <div className="space-y-4 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <a
+                href="https://deepgram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+              >
+                <img 
+                  src={deepgramLogo} 
+                  alt="Deepgram" 
+                  className="h-16 w-16 object-contain mb-2"
+                />
+                <h4 className="font-semibold text-sm mb-1">Deepgram</h4>
+                <p className="text-xs text-muted-foreground text-center">Advanced speech recognition</p>
+              </a>
+              <a
+                href="https://openai.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+              >
+                <img 
+                  src={openaiLogo} 
+                  alt="OpenAI" 
+                  className="h-16 w-16 object-contain mb-2"
+                />
+                <h4 className="font-semibold text-sm mb-1">OpenAI</h4>
+                <p className="text-xs text-muted-foreground text-center">State-of-the-art translation</p>
+              </a>
+              <a
+                href="https://elevenlabs.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+              >
+                <img 
+                  src={elevenlabsLogo} 
+                  alt="Eleven Labs" 
+                  className="h-16 w-16 object-contain mb-2"
+                />
+                <h4 className="font-semibold text-sm mb-1">Eleven Labs</h4>
+                <p className="text-xs text-muted-foreground text-center">Lifelike voice synthesis</p>
+              </a>
+            </div>
+          </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
