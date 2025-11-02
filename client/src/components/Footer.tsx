@@ -1,4 +1,5 @@
 import { FaGithub, FaLinkedin, FaYoutube, FaProductHunt } from "react-icons/fa";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
@@ -24,6 +25,16 @@ export function Footer() {
         </a>
 
         <div className="flex items-center gap-4">
+          <Button variant="outline" asChild>
+            <a
+              href="https://github.com/ysskrishna/ai-video-dub-generator"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Project
+            </a>
+          </Button>
+          
           <a
             href="https://github.com/ysskrishna"
             target="_blank"
