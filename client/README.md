@@ -41,7 +41,7 @@ npm install
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173` (or the next available port).
+The application will be available at `http://localhost:8080` (or the next available port).
 
 Make sure the backend API is running at `http://localhost:8085` (or update the API_BASE_URL in `src/lib/api.ts`).
 

@@ -1,70 +1,98 @@
 # AI Video Dub Generator
 
-An AI-powered application that automatically dubs videos from one language to another using advanced speech recognition, translation, and text-to-speech technologies.
+An innovative AI-driven platform that seamlessly dubs videos across languages. Powered by Deepgram for speech recognition, OpenAI for translation, and ElevenLabs for lifelike voiceovers, this application helps content creators, educators, and businesses reach global audiences effortlessly.
 
+## Badges
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
+![Node.js](https://img.shields.io/badge/node.js-v18+-green.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688.svg?logo=fastapi)
+![Deepgram](https://img.shields.io/badge/Deepgram-Speech%20to%20Text-0A0A0A?logo=deepgram&logoColor=00D4FF)
+![OpenAI](https://img.shields.io/badge/OpenAI-Translation-412991?logo=openai&logoColor=white)
+![ElevenLabs](https://img.shields.io/badge/ElevenLabs-Text%20to%20Speech-000000?logo=elevenlabs&logoColor=white)
+![React](https://img.shields.io/badge/React-18.3+-61dafb.svg?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178c6.svg?logo=typescript)
+![Vite](https://img.shields.io/badge/Vite-5.4+-646cff.svg?logo=vite)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38b2ac.svg?logo=tailwind-css)
+
+
+![og](media/og.png)
+
+## Demo
 ![Demo](media/demo.png)
 
-## Features
+## Architecture Diagram
+![Architecture](media/diagram.png)
 
-- **Automatic Video Dubbing**: Convert videos from one language to another
-- **Real-time Processing**: Monitor job progress with live status updates
-- **Multiple Language Support**: Support various target languages
-- **High-Quality Audio**: Uses advanced TTS engines for natural-sounding voice synthesis
-- **Web Interface**: Clean, modern UI for easy video upload and management
+## ✨ Features
 
-## Example Output
+- **Automatic Video Dubbing**: Convert YouTube videos from one language to another with AI-powered translation and voice synthesis
+- **Real-time Job Monitoring**: Track video dubbing progress with live status updates
+- **Multiple Language Support**: Support for 30+ target languages
+- **High-Quality Audio**: Advanced TTS engines for natural-sounding voice synthesis
+- **Modern Web Interface**: Clean, responsive UI built with React and TypeScript
+- **RESTful API**: FastAPI-based backend with automatic documentation
 
-Check out the example dubbed video in the `media/examples/` directory:
-- `youtubeid_JcfOdtBk55Y_en_to_hi_dub.mp4` - English to Hindi dubbing example
-
-## Architecture
-
-This project consists of two main components:
-
-### Frontend (`/client`)
-- **Technology Stack**: React, TypeScript, Vite
-- **UI Framework**: shadcn/ui components with Tailwind CSS
-- **State Management**: TanStack Query for server state
-- **Routing**: React Router DOM
-
-### Backend (`/backend`)
-- **Framework**: FastAPI (Python)
-- **Database**: SQLite with SQLAlchemy ORM
-- **Video Processing**: MoviePy for video manipulation
-- **AI Services**: 
-  - Deepgram for speech-to-text
-  - OpenAI for translation
-  - ElevenLabs for text-to-speech
-- **Video Download**: yt-dlp for YouTube video processing
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- Python 3.11+
-- UV package manager
 
-### Backend Setup
-```bash
-cd backend
-uv sync
-uv run python main.py
-```
+- **Node.js** v18+ (for frontend)
+- **Python** 3.11+ with [UV](https://github.com/astral-sh/uv) (for backend)
+- **API Keys**: Deepgram, OpenAI, and ElevenLabs
 
-### Frontend Setup
-```bash
-cd client
-npm install
-npm run dev
-```
+### Getting Started
 
-## API Endpoints
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ysskrishna/ai-video-dub-generator.git
+   cd ai-video-dub-generator
+   ```
 
-- `POST /api/video/upload` - Upload video for dubbing
-- `GET /api/video/jobs` - List all dubbing jobs
-- `GET /api/video/jobs/{job_id}` - Get specific job details
-- `GET /api/video/jobs/{job_id}/download` - Download completed dubbed video
+2. **Set up the Backend**
+   - Navigate to `backend/` directory
+   - Follow the detailed setup instructions in [backend/README.md](backend/README.md)
+   - The API server runs on `http://localhost:8085`
 
+3. **Set up the Frontend**
+   - Navigate to `client/` directory
+   - Follow the detailed setup instructions in [client/README.md](client/README.md)
+   - The frontend runs on `http://localhost:8080`
+
+## 📚 Documentation
+
+- [Backend README](backend/README.md) - Backend setup, API documentation, and architecture details
+- [Frontend README](client/README.md) - Frontend setup, project structure, and development guide
+
+
+### Technology Stack
+
+- **Frontend**: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
+- **Backend**: FastAPI (Python), SQLite, SQLAlchemy
+- **AI Services**: 
+  - [Deepgram](https://deepgram.com) - Speech-to-text transcription
+  - [OpenAI](https://openai.com) - Language translation
+  - [ElevenLabs](https://elevenlabs.io) - Text-to-speech synthesis
+- **Video Processing**: MoviePy, yt-dlp
+
+## 📺 Example Output
+
+Check out example dubbed videos in the `media/examples/` directory:
+
+### Example 1: English to Hindi
+- **Source Video**: [YouTube Video](https://www.youtube.com/watch?v=JcfOdtBk55Y)
+- **Dubbed Output**: [youtubeid_JcfOdtBk55Y_en_to_hi_dub.mp4](media/examples/youtubeid_JcfOdtBk55Y_en_to_hi_dub.mp4)
+
+### Example 2: English to Chinese
+- **Source Video**: [YouTube Video](https://www.youtube.com/watch?v=nbf0qPC3Wwk)
+- **Dubbed Output**: [youtubeid_nbf0qPC3Wwk_en_to_zh_dub.mp4](media/examples/youtubeid_nbf0qPC3Wwk_en_to_zh_dub.mp4)
+
+
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
