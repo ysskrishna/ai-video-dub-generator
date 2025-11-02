@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Video } from "lucide-react";
+import { Video, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
@@ -16,8 +16,10 @@ export function Header() {
               href="https://github.com/ysskrishna/ai-video-dub-generator"
               target="_blank"
               rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
             >
               View Project
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </Button>
         </div>

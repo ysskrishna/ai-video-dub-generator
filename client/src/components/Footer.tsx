@@ -1,4 +1,5 @@
 import { FaGithub, FaLinkedin, FaYoutube, FaProductHunt } from "react-icons/fa";
+import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Footer() {
@@ -30,8 +31,10 @@ export function Footer() {
               href="https://github.com/ysskrishna/ai-video-dub-generator"
               target="_blank"
               rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
             >
               View Project
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </Button>
           
