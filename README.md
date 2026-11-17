@@ -4,7 +4,7 @@ An innovative AI-driven platform that seamlessly dubs videos across languages. P
 
 ## Badges
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ysskrishna/ai-video-dub-generator/blob/main/LICENSE)
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
 ![Node.js](https://img.shields.io/badge/node.js-v18+-green.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688.svg?logo=fastapi)
@@ -15,6 +15,7 @@ An innovative AI-driven platform that seamlessly dubs videos across languages. P
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178c6.svg?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-5.4+-646cff.svg?logo=vite)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38b2ac.svg?logo=tailwind-css)
+[![Author site](https://img.shields.io/badge/author-ysskrishna.space-informational)](https://ysskrishna.space)
 
 
 ![og](media/og.png)
@@ -88,12 +89,32 @@ Check out example dubbed videos in the `media/examples/` directory:
 - **Source Video**: [YouTube Video](https://www.youtube.com/watch?v=nbf0qPC3Wwk)
 - **Dubbed Output**: [youtubeid_nbf0qPC3Wwk_en_to_zh_dub.mp4](media/examples/youtubeid_nbf0qPC3Wwk_en_to_zh_dub.mp4)
 
+## Built and maintained by
 
+AI Video Dub Generator is built and maintained by:
 
-## 📄 License
+| | Name | GitHub | Role |
+|---|------|--------|------|
+| <img src="https://github.com/ysskrishna.png?size=120" width="60" height="60" alt="Y. Siva Sai Krishna"> | **Y. Siva Sai Krishna** | [@ysskrishna](https://github.com/ysskrishna) | Creator |
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Support
 
-## 👨‍💻 Author
+If you find this project helpful:
 
-**Y. Siva Sai Krishna** ([@ysskrishna](https://github.com/ysskrishna))
+- ⭐ Star the repository
+- 🐛 [Report issues](https://github.com/ysskrishna/ai-video-dub-generator/issues)
+- 🔀 Submit pull requests
+- 💝 [Sponsor on GitHub](https://github.com/sponsors/ysskrishna)
+
+## License
+
+MIT © [Y. Siva Sai Krishna](https://github.com/ysskrishna) — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="left">
+  <a href="https://github.com/ysskrishna">Author's GitHub</a> •
+  <a href="https://linkedin.com/in/ysskrishna">Author's LinkedIn</a> •
+  <a href="https://ysskrishna.space">Author's site</a> •
+  <a href="https://github.com/ysskrishna/ai-video-dub-generator/issues">Report Issues</a>
+</p>
